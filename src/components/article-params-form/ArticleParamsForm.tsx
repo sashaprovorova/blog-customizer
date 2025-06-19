@@ -13,11 +13,16 @@ import {
 	fontFamilyOptions,
 	fontSizeOptions,
 	OptionType,
+	ArticleStateType,
 } from 'src/constants/articleProps';
 import { RadioGroup } from 'src/ui/radio-group';
 import { Separator } from 'src/ui/separator';
 
-export const ArticleParamsForm = () => {
+type ArticleParamsFormProps = {
+	setSettings: (value: ArticleStateType) => void;
+};
+
+export const ArticleParamsForm = ({ setSettings }: ArticleParamsFormProps) => {
 	// ОТКРЫВАЕМ И ЗАКРЫВАЕМ ФОРМУ
 	const [isOpen, setIsOpen] = useState(false);
 	const sideRef = useRef<HTMLElement>(null);
@@ -38,12 +43,6 @@ export const ArticleParamsForm = () => {
 	}, []);
 
 	// ИЗМЕНЯЕМ СОДЕРЖИМОЕ ФОРМЫ
-	// const [font, setFont] = useState(defaultArticleState.fontFamilyOption);
-	// const [fontSize, setFontSize] = useState(defaultArticleState.fontSizeOption);
-	// const [fontColor, setFontColor] = useState(defaultArticleState.fontColor);
-	// const [bgColor, setBgColor] = useState(defaultArticleState.backgroundColor);
-	// const [width, setWidth] = useState(defaultArticleState.contentWidth);
-
 	const [form, setForm] = useState(defaultArticleState);
 	const handleChangeInForm =
 		(field: keyof typeof defaultArticleState) => (value: OptionType) => {
@@ -54,12 +53,13 @@ export const ArticleParamsForm = () => {
 	const handleResetForm = (event: React.FocusEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		setForm(defaultArticleState);
+		setSettings(defaultArticleState);
 	};
 
 	// ОТПРАВЛЯЕМ ФОРМУ
 	const handleSubmitForm = (event: React.FocusEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		// TODO: логика для смены настроек
+		setSettings(form);
 		setIsOpen(false);
 	};
 
@@ -76,54 +76,28 @@ export const ArticleParamsForm = () => {
 					<Text uppercase={true} as='h1' weight={800} size={31}>
 						Задайте параметры
 					</Text>
-					{/* <Select
-						selected={font}
-						title='шрифт'
-						options={fontFamilyOptions}
-						onChange={(selected) => setFont(selected)}></Select> */}
 					<Select
 						selected={form.fontFamilyOption}
 						title='шрифт'
 						options={fontFamilyOptions}
 						onChange={handleChangeInForm('fontFamilyOption')}></Select>
-					{/* <RadioGroup
-						selected={fontSize}
-						title='размер шрифта'
-						name='размер шрифта'
-						options={fontSizeOptions}
-						onChange={(selected) => setFontSize(selected)}></RadioGroup> */}
 					<RadioGroup
 						selected={form.fontSizeOption}
 						title='размер шрифта'
 						name='размер шрифта'
 						options={fontSizeOptions}
 						onChange={handleChangeInForm('fontSizeOption')}></RadioGroup>
-					{/* <Select
-						selected={fontColor}
-						title='цвет шрифта'
-						options={fontColors}
-						onChange={(selected) => setFontColor(selected)}></Select> */}
 					<Select
 						selected={form.fontColor}
 						title='цвет шрифта'
 						options={fontColors}
 						onChange={handleChangeInForm('fontColor')}></Select>
 					<Separator />
-					{/* <Selects
-						selected={bgColor}
-						title='цвет фона'
-						options={backgroundColors}
-						onChange={(selected) => setBgColor(selected)}></Selects> */}
 					<Select
 						selected={form.backgroundColor}
 						title='цвет фона'
 						options={backgroundColors}
 						onChange={handleChangeInForm('backgroundColor')}></Select>
-					{/* <Select
-						selected={width}
-						title='ширина контента'
-						options={contentWidthArr}
-						onChange={(selected) => setWidth(selected)}></Select> */}
 					<Select
 						selected={form.contentWidth}
 						title='ширина контента'
