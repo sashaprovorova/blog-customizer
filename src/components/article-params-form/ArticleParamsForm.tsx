@@ -17,6 +17,7 @@ import {
 } from 'src/constants/articleProps';
 import { RadioGroup } from 'src/ui/radio-group';
 import { Separator } from 'src/ui/separator';
+import { useClose } from 'src/hooks/useClose';
 
 type ArticleParamsFormProps = {
 	setSettings: (value: ArticleStateType) => void;
@@ -24,23 +25,14 @@ type ArticleParamsFormProps = {
 
 export const ArticleParamsForm = ({ setSettings }: ArticleParamsFormProps) => {
 	// ОТКРЫВАЕМ И ЗАКРЫВАЕМ ФОРМУ
-	const [isOpen, setIsOpen] = useState(false);
-	const sideRef = useRef<HTMLElement>(null);
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const formRef = useRef<HTMLElement>(null);
 
-	// закрываем при нажатии мимо открывшейся формы
-	useEffect(() => {
-		// при монтировнии следим за нажатием
-		const handleClickOutsideForm = (event: MouseEvent) => {
-			if (sideRef.current && !sideRef.current.contains(event.target as Node)) {
-				setIsOpen(false);
-			}
-		};
-		document.addEventListener('mousedown', handleClickOutsideForm);
-		// при размонтировнии убирает слушатель
-		return () => {
-			document.removeEventListener('mousedown', handleClickOutsideForm);
-		};
-	}, []);
+	useClose({
+		isOpen: isMenuOpen,
+		onClose: () => setIsMenuOpen(false),
+		rootRef: formRef,
+	});
 
 	// ИЗМЕНЯЕМ СОДЕРЖИМОЕ ФОРМЫ
 	const [form, setForm] = useState(defaultArticleState);
@@ -60,15 +52,20 @@ export const ArticleParamsForm = ({ setSettings }: ArticleParamsFormProps) => {
 	const handleSubmitForm = (event: React.FocusEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		setSettings(form);
-		setIsOpen(false);
+		setIsMenuOpen(false);
 	};
 
 	return (
 		<>
-			<ArrowButton isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
+			<ArrowButton
+				isOpen={isMenuOpen}
+				onClick={() => setIsMenuOpen(!isMenuOpen)}
+			/>
 			<aside
-				ref={sideRef}
-				className={clsx(styles.container, isOpen && styles.container_open)}>
+				ref={formRef}
+				className={clsx(styles.container, {
+					[styles.container_open]: isMenuOpen,
+				})}>
 				<form
 					className={styles.form}
 					onReset={handleResetForm}
